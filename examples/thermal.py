@@ -1,15 +1,20 @@
 #!/usr/bin/env python
 
-import datetime
 import time
 
-from microdotphat import write_string, set_decimal, clear, show
+import microcontroller
+import board
+from busio import I2C
+from microdotphat import MicroDotpHAT
+
+bus = I2C(board.GP5, board.GP4)
+mdp = MicroDotpHAT(bus)
 
 
 print("""Thermal
 
-Displays the temperature measured from thermal zone 0, using
-/sys/class/thermal/thermal_zone0/temp
+Displays the temperature measured from chip, using
+microcontroller.cpu.temperature
 
 Press Ctrl+C to exit.
 """)
@@ -17,11 +22,8 @@ Press Ctrl+C to exit.
 delay = 1
 
 while True:
-    clear()
-    path="/sys/class/thermal/thermal_zone0/temp"
-    f = open(path, "r")
-    temp_raw = int(f.read().strip())
-    temp = float(temp_raw / 1000.0)
-    write_string( "%.2f" % temp + "c", kerning=False)
-    show()
+    mdp.clear()
+    temp = microcontroller.cpu.temperature
+    mdp.write_string( "%.2f" % temp + "c", kerning=False)
+    mdp.show()
     time.sleep(delay)

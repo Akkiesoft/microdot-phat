@@ -3,8 +3,12 @@
 import math
 import time
 
-from microdotphat import clear, set_pixel, show
+import board
+from busio import I2C
+from microdotphat import MicroDotpHAT
 
+bus = I2C(board.GP5, board.GP4)
+mdp = MicroDotpHAT(bus)
 
 print("""Sine Wave
 
@@ -14,11 +18,11 @@ Press Ctrl+C to exit.
 """)
 
 while True:
-    clear()
-    t = time.time() * 10
+    mdp.clear()
+    t = time.monotonic() * 10
     for x in range(45):
         y = int((math.sin(t + (x/2.5)) + 1) * 3.5)
-        set_pixel(x, y, 1)
+        mdp.set_pixel(x, y, 1)
         
-    show()
+    mdp.show()
     time.sleep(0.01)

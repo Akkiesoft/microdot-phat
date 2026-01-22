@@ -3,7 +3,12 @@
 import math
 import time
 
-from microdotphat import clear, set_brightness, show, write_string, WIDTH, HEIGHT
+import board
+from busio import I2C
+from microdotphat import MicroDotpHAT
+
+bus = I2C(board.GP5, board.GP4)
+mdp = MicroDotpHAT(bus)
 
 
 print("""Fading Text
@@ -18,25 +23,25 @@ strings = ["One", "Two", "Three", "Four"]
 string = 0
 shown = True
 
-show()
+mdp.show()
 
 # Start time. Phase offset by math.pi/2
-start = time.time()
+start = time.monotonic()
 
 while True:
     # Fade the brightness in/out using a sine wave
-    b = (math.sin((time.time() - start) * speed) + 1) / 2
-    set_brightness(b)
+    b = (math.sin((time.monotonic() - start) * speed) + 1) / 2
+    mdp.set_brightness(b)
 
     # At minimum brightness, swap out the string for the next one
     if b < 0.002 and shown:
-        clear()
-        write_string(strings[string], kerning=False)
+        mdp.clear()
+        mdp.write_string(strings[string], kerning=False)
 
         string += 1
         string %= len(strings)
 
-        show()
+        mdp.show()
         shown = False
 
     # At maximum brightness, confirm the string has been shown

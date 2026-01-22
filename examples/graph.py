@@ -3,7 +3,12 @@
 from time import sleep
 from random import randint
 
-from microdotphat import set_col, show, clear
+import board
+from busio import I2C
+from microdotphat import MicroDotpHAT
+
+bus = I2C(board.GP5, board.GP4)
+mdp = MicroDotpHAT(bus)
 
 
 print("""Graph
@@ -17,14 +22,14 @@ graph = []
 filled = True
 
 while True:
-    clear()
+    mdp.clear()
     graph += [randint(0,7)]
     while len(graph) > 45:
         graph.pop(0)
 
     for x, val in enumerate(graph):
         if filled:
-            set_col(x + (45-len(graph)), [
+            mdp.set_col(x + (45-len(graph)), [
                 0,
                 0b1000000,
                 0b1100000,
@@ -34,7 +39,7 @@ while True:
                 0b1111110,
                 0b1111111][val])
         else:
-            set_col(x, 1 << (7-val))
+            mdp.set_col(x, 1 << (7-val))
 
-    show()
+    mdp.show()
     sleep(0.05)
