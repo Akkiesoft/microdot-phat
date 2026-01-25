@@ -1,9 +1,3 @@
-try:
-    from smbus2 import SMBus
-except ImportError:
-    raise RuntimeError("This library requires smbus2\nInstall with: pip install smbus2")
-
-
 ADDR = 0x61
 MODE = 0b00011000
 OPTS = 0b00001110  # 1110 = 35mA, 0000 = 40mA
@@ -50,26 +44,32 @@ class NanoMatrix:
     _BUF_MATRIX_2 = [0] * 8
 '''
 
-    def __init__(self, address=ADDR):
+    def __init__(self, bus, address=ADDR):
         self.address = address
         self._brightness = 127
 
-        self.bus = SMBus(1)
+        self.bus = bus
+        while not self.bus.try_lock():
+            pass
 
-        self.bus.write_byte_data(self.address, CMD_MODE, MODE)
-        self.bus.write_byte_data(self.address, CMD_OPTIONS, OPTS)
-        self.bus.write_byte_data(self.address, CMD_BRIGHTNESS, self._brightness)
+        self.bus.writeto(self.address, bytearray([CMD_MODE, MODE]))
+        self.bus.writeto(self.address, bytearray([CMD_OPTIONS, OPTS]))
+        self.bus.writeto(self.address, bytearray([CMD_BRIGHTNESS, self._brightness]))
+        self.bus.unlock()
 
         self._BUF_MATRIX_1 = [0] * 8
         self._BUF_MATRIX_2 = [0] * 8
 
     @staticmethod
-    def is_connected(address=0x61):
-        bus = SMBus(1)
+    def is_connected(bus, address=0x61):
+        while not bus.try_lock():
+            pass
         try:
             bus.write_byte(address, 0)
+            bus.unlock()
             return True
-        except (IOError, OSError):  # exception if write_byte fails, meaning the device isn't connected
+        except:  # exception if write_byte fails, meaning the device isn't connected
+            bus.unlock()
             return False
 
     def set_brightness(self, brightness):
@@ -77,7 +77,10 @@ class NanoMatrix:
         if self._brightness > 127:
             self._brightness = 127
 
-        self.bus.write_byte_data(self.address, CMD_BRIGHTNESS, self._brightness)
+        while not self.bus.try_lock():
+            pass
+        self.bus.writeto(self.address, bytearray([CMD_BRIGHTNESS, self._brightness]))
+        self.bus.unlock()
 
     def set_decimal(self, m, c):
 
@@ -134,21 +137,29 @@ class NanoMatrix:
     def update(self):
         for x in range(10):
             try:
-                self.bus.write_i2c_block_data(self.address, CMD_MATRIX_1, self._BUF_MATRIX_1)
-                self.bus.write_i2c_block_data(self.address, CMD_MATRIX_2, self._BUF_MATRIX_2)
+                while not self.bus.try_lock():
+                    pass
+                self.bus.writeto(self.address, bytearray([CMD_MATRIX_1] + self._BUF_MATRIX_1))
+                self.bus.writeto(self.address, bytearray([CMD_MATRIX_2] + self._BUF_MATRIX_2))
 
-                self.bus.write_byte_data(self.address, CMD_UPDATE, 0x01)
+                self.bus.writeto(self.address, bytearray([CMD_UPDATE, 0x01]))
+                self.bus.unlock()
                 break
-            except IOError:
-                print("IO Error")
+            except:
+                print("Error")
 
 
 if __name__ == "__main__":
+    import board
+    from busio import I2C
+    from microdotphat import MicroDotpHAT
     import time
 
-    m1 = NanoMatrix(address=0x63)
-    m2 = NanoMatrix(address=0x62)
-    m3 = NanoMatrix(address=0x61)
+    bus = I2C(board.GP5, board.GP4)
+
+    m1 = NanoMatrix(bus, address=0x63)
+    m2 = NanoMatrix(bus, address=0x62)
+    m3 = NanoMatrix(bus, address=0x61)
 
     def clear_matrix(n, m):
         for y in range(7):
