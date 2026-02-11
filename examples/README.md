@@ -1,12 +1,14 @@
 # Examples
 
+To run the sample script, it is recommended that you copy the script to the CIRCUITPY drive and write an import statement in code.py :)
+
 ## Advanced Scrolling
 
 Advanced scrolling example which displays a message line-by-line
 and then skips back to the beginning.
 
 ```
-advanced-scrolling.py
+import advanced-scrolling
 ```
 
 ## Clock
@@ -14,7 +16,7 @@ advanced-scrolling.py
 Displays the time in hours, minutes and seconds
 
 ```
-./clock.py
+import clock
 ```
 
 ## Fading Text
@@ -22,7 +24,7 @@ Displays the time in hours, minutes and seconds
 Uses the brightness control to fade between messages.
 
 ```
-fading-text.py
+import fading-text
 ```
 
 ## Flash
@@ -30,7 +32,7 @@ fading-text.py
 Flashes all the elements.
 
 ```
-./flash.py
+import flash
 ```
 
 ## Graph
@@ -38,7 +40,7 @@ Flashes all the elements.
 Plots random numbers scross the screen in a bar graph.
 
 ```
-./graph.py
+import graph
 ```
 
 ## Scrolling Text
@@ -46,7 +48,7 @@ Plots random numbers scross the screen in a bar graph.
 Scrolls a message across the screen.
 
 ```
-./scrolling_text.py "your message"
+import scrolling_text
 ```
 
 ## Sine Wave
@@ -54,16 +56,16 @@ Scrolls a message across the screen.
 Displays a sine wave across your pHAT.
 
 ```
-./sine-wave.py
+import sine-wave
 ```
 
 ## Thermal
 
 Displays the temperature measured from thermal zone 0, using
-/sys/class/thermal/thermal_zone0/temp
+/syclasthermathermal_zonetemp
 
 ```
-./thermal.py
+import thermal
 ```
 
 ## Tiny Font
@@ -71,7 +73,7 @@ Displays the temperature measured from thermal zone 0, using
 Displays an IP address in a tiny, tiny number font!
 
 ```
-./tiny-font.py
+import tiny-font
 ```
 
 ## Vertical Text
@@ -79,5 +81,5 @@ Displays an IP address in a tiny, tiny number font!
 Scrolls text messages vertically.
 
 ```
-./vertical-text.py
+import vertical-text
 ```
