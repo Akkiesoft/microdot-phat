@@ -10,7 +10,11 @@ kerned to one pixel spacing, or spaced to place one character per matrix.
 
 """
 
-import atexit
+no_atexit = False
+try:
+    from sys import atexit
+except ImportError:
+    no_atexit = True
 
 from .font import font as _font, tinynumbers as _tinynumbers
 from .matrix import NanoMatrix
@@ -44,7 +48,8 @@ class MicroDotpHAT():
             (self.n3, 1), (self.n3, 0)
         ]
 
-        atexit.register(self._exit)
+        if not no_atexit:
+            atexit.register(self._exit)
 
 
     def width(self):

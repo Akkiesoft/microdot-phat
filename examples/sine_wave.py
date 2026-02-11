@@ -3,11 +3,10 @@
 import math
 import time
 
-import board
-from busio import I2C
+from machine import I2C
 from microdotphat import MicroDotpHAT
 
-bus = I2C(board.GP5, board.GP4)
+bus = I2C()
 mdp = MicroDotpHAT(bus)
 
 print("""Sine Wave

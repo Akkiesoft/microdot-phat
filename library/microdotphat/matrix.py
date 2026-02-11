@@ -49,27 +49,20 @@ class NanoMatrix:
         self._brightness = 127
 
         self.bus = bus
-        while not self.bus.try_lock():
-            pass
 
         self.bus.writeto(self.address, bytearray([CMD_MODE, MODE]))
         self.bus.writeto(self.address, bytearray([CMD_OPTIONS, OPTS]))
         self.bus.writeto(self.address, bytearray([CMD_BRIGHTNESS, self._brightness]))
-        self.bus.unlock()
 
         self._BUF_MATRIX_1 = [0] * 8
         self._BUF_MATRIX_2 = [0] * 8
 
     @staticmethod
     def is_connected(bus, address=0x61):
-        while not bus.try_lock():
-            pass
         try:
             bus.writeto(address, bytearray([0]))
-            bus.unlock()
             return True
         except:  # exception if write_byte fails, meaning the device isn't connected
-            bus.unlock()
             return False
 
     def set_brightness(self, brightness):
@@ -137,25 +130,21 @@ class NanoMatrix:
     def update(self):
         for x in range(10):
             try:
-                while not self.bus.try_lock():
-                    pass
                 self.bus.writeto(self.address, bytearray([CMD_MATRIX_1] + self._BUF_MATRIX_1))
                 self.bus.writeto(self.address, bytearray([CMD_MATRIX_2] + self._BUF_MATRIX_2))
 
                 self.bus.writeto(self.address, bytearray([CMD_UPDATE, 0x01]))
-                self.bus.unlock()
                 break
             except:
                 print("Error")
 
 
 if __name__ == "__main__":
-    import board
-    from busio import I2C
+    from machine import I2C
     from microdotphat import MicroDotpHAT
     import time
 
-    bus = I2C(board.GP5, board.GP4)
+    bus = I2C()
 
     m1 = NanoMatrix(bus, address=0x63)
     m2 = NanoMatrix(bus, address=0x62)
