@@ -65,7 +65,7 @@ class NanoMatrix:
         while not bus.try_lock():
             pass
         try:
-            bus.write_byte(address, 0)
+            bus.writeto(address, bytearray([0]))
             bus.unlock()
             return True
         except:  # exception if write_byte fails, meaning the device isn't connected
